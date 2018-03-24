@@ -1,0 +1,7 @@
+c:\users\crosse331\documents\visual studio 2015\Projects\0_lab\0_lab\bin\Debug\0_lab.exe.config
+E:\work\csharp_labs\0_lab\0_lab\bin\Debug\0_lab.exe.config
+E:\work\csharp_labs\0_lab\0_lab\bin\Debug\0_lab.exe
+E:\work\csharp_labs\0_lab\0_lab\bin\Debug\0_lab.pdb
+E:\work\csharp_labs\0_lab\0_lab\obj\Debug\0_lab.csprojResolveAssemblyReference.cache
+E:\work\csharp_labs\0_lab\0_lab\obj\Debug\0_lab.exe
+E:\work\csharp_labs\0_lab\0_lab\obj\Debug\0_lab.pdb
