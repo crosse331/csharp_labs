@@ -30,22 +30,24 @@ namespace _0_lab
 
                 if (s1 != s2)
                 {
-                    PrintDiff(firstReader, firstFileName);
-                    PrintDiff(secondReader, secondFileName);
+                    PrintDiff(s1 ,firstReader, firstFileName);
+                    PrintDiff(s2,secondReader, secondFileName);
                     break;
                 }
             }
         }
 
-        static void PrintDiff(StreamReader reader, string name)
+        static void PrintDiff(int readed, StreamReader reader, string name)
         {
             Console.WriteLine(string.Format("File {0}:", name));
 
-            for (int i = 0; i < 16; i++)
+            Console.WriteLine(Convert.ToString(readed, 2));
+
+            for (int i = 0; i < 15; i++)
             {
                 if (!reader.EndOfStream)
                 {
-                    Console.WriteLine(reader.Read());
+                    Console.WriteLine(Convert.ToString( reader.Read(), 2));
                 }
                 else
                 {
