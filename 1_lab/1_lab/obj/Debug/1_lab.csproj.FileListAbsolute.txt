@@ -1,0 +1,6 @@
+G:\source\csharp_labs\1_lab\1_lab\bin\Debug\1_lab.exe.config
+G:\source\csharp_labs\1_lab\1_lab\bin\Debug\1_lab.exe
+G:\source\csharp_labs\1_lab\1_lab\bin\Debug\1_lab.pdb
+G:\source\csharp_labs\1_lab\1_lab\obj\Debug\1_lab.csprojResolveAssemblyReference.cache
+G:\source\csharp_labs\1_lab\1_lab\obj\Debug\1_lab.exe
+G:\source\csharp_labs\1_lab\1_lab\obj\Debug\1_lab.pdb
