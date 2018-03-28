@@ -4,8 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.Serialization.Json;
-
-using System.IO;
+using System.Runtime.Serialization;
 
 namespace Shapes
 {
@@ -126,7 +125,7 @@ namespace Shapes
         private void Calculate(Vec2f F1, Vec2f F2, float bigO)
         {
             this.a = bigO / 2;
-            var c = Math.Pow((Math.Pow(F1.x - F2.x, 2) + Math.Pow(F1.y - F2.y, 2)), 0.5d)/2;
+            var c = Math.Pow((Math.Pow(F1.x - F2.x, 2) + Math.Pow(F1.y - F2.y, 2)), 0.5d) / 2;
             var e = c / a;
             var tmp = a;
             tmp *= (float)Math.Pow(1 - Math.Pow(e, 2), 0.5d);
@@ -273,170 +272,61 @@ namespace Shapes
         }
     }
 
-    class Program
+    [DataContractAttribute]
+    abstract class ShapeInfo
     {
-        static List<Shape> allShapes = new List<Shape>();
+        [DataMemberAttribute]
+        public float[] pos = new float[2];
+    }
 
-        static void Main(string[] args)
+    [DataContractAttribute]
+    class CircleInfo : ShapeInfo
+    {
+        [DataMemberAttribute]
+        public float radius;
+        public CircleInfo(Circle c)
         {
-            while (true)
-            {
-                string input = Console.ReadLine();
-                input.ToLower();
-
-                if (input == "c")
-                {
-                    AddShape();
-                }
-                else if (input == "l")
-                {
-                    foreach (var s in allShapes)
-                    {
-                        Console.WriteLine(s.ToString());
-                    }
-                }
-                else if (input == "q")
-                {
-                    break;
-                }
-                else if (input == "h")
-                {
-                    Console.WriteLine("C - создать новый геометрический объект, вызывает подменю: E — Ellipse (координаты фокусов + большая ось) C — Circle (координаты цетра + радиус) P — Polygon (кол-во точек + сами точки) Q — отмена L — печать всего списка фигур с атрибутами (площадь, периметр, центр масс) H — вывод подсказки (Help) Q — выход");
-                    Console.WriteLine("S - сохранить фигуры в json файл.");
-                }
-                else if (input == "s")
-                {
-                    SaveShapes();
-                }
-                else
-                {
-                    Console.WriteLine("Wrong command!");
-                }
-            }
-
+            this.pos[0] = c.pos.x;
+            this.pos[1] = c.pos.y;
+            this.radius = c.radius;
         }
+    }
 
-        static void AddShape()
+    [DataContractAttribute]
+    class EllipseInfo : ShapeInfo
+    {
+        [DataMemberAttribute]
+        public float[] f1 = new float[2];
+        [DataMemberAttribute]
+        public float[] f2 = new float[2];
+        [DataMemberAttribute]
+        public float bigO;
+
+        public EllipseInfo(Ellipse e)
         {
-            Console.WriteLine("Creating new shape!");
-            string input = Console.ReadLine();
-            input.ToLower();
-            if (input == "c")
-            {
-                CreateCircle();
-            }
-            else if (input == "e")
-            {
-                CreateEllipse();
-            }
-            else if (input == "p")
-            {
-                CreatePolygon();
-            }
-            else if (input == "q")
-            {
-                return;
-            }
-            else
-            {
-                Console.WriteLine("Wrong command!");
-            }
+            this.f1[0] = e.f1.x;
+            this.f1[1] = e.f1.y;
+            this.f2[0] = e.f2.x;
+            this.f2[1] = e.f2.y;
+
+            this.bigO = e.a * 2;
         }
+    }
 
-        static void CreateCircle()
+    [DataContractAttribute]
+    class PolygonInfo : ShapeInfo
+    {
+        [DataMemberAttribute]
+        public List<float[]> points = new List<float[]>();
+
+        public PolygonInfo(Polygon p)
         {
-            Console.WriteLine("Please enter center coord in format: x y");
-            string input = Console.ReadLine();
-            var res = input.Split(' ');
-            if (res.Length != 2)
+            //this.points = new float[p.points.Count, 2];
+            for (int i = 0; i < p.points.Count; i++)
             {
-                Console.WriteLine("Wrong command!");
-                return;
-            }
-            var center = new Vec2f(Convert.ToSingle(res[0]), Convert.ToSingle(res[1]));
-            Console.WriteLine("Please enter radius");
-            input = Console.ReadLine();
-            float rad = Convert.ToSingle(input);
-
-            allShapes.Add(new Circle(rad, center));
-        }
-
-        static void CreateEllipse()
-        {
-            Console.WriteLine("Please enter focus1 coord in format: x y");
-            string input = Console.ReadLine();
-            var res1 = input.Split(' ');
-            if (res1.Length != 2)
-            {
-                Console.WriteLine("Wrong command!");
-                return;
-            }
-            var f1 = new Vec2f(Convert.ToSingle(res1[0]), Convert.ToSingle(res1[1]));
-            Console.WriteLine("Please enter focus2 coord in format: x y");
-            input = Console.ReadLine();
-            var res2 = input.Split(' ');
-            if (res2.Length != 2)
-            {
-                Console.WriteLine("Wrong command!");
-                return;
-            }
-            var f2 = new Vec2f(Convert.ToSingle(res2[0]), Convert.ToSingle(res2[1]));
-            Console.WriteLine("Please enter big O");
-            input = Console.ReadLine();
-            float a = Convert.ToSingle(input);
-
-            allShapes.Add(new Ellipse(f1, f2, a));
-        }
-
-        static void CreatePolygon()
-        {
-            Console.WriteLine("Please enter count of points");
-            string input = Console.ReadLine();
-            int count = Convert.ToInt32(input);
-            int k = 0;
-            var points = new List<Vec2f>();
-            while (k<count)
-            {
-                Console.WriteLine(string.Format("Please enter point ({0}/{1}) coord in format: x y", k+1, count));
-                input = Console.ReadLine();
-                var res = input.Split(' ');
-                if (res.Length != 2)
-                {
-                    Console.WriteLine("Wrong command!");
-                    return;
-                }
-                var point = new Vec2f(Convert.ToSingle(res[0]), Convert.ToSingle(res[1]));
-                points.Add(point);
-                k++;
-            }
-
-            allShapes.Add(new Polygon(points));
-        }
-
-        static void SaveShapes()
-        {
-            var serializer = new DataContractJsonSerializer(typeof(ShapeInfo[]), new List<Type>() { typeof(ShapeInfo), typeof(CircleInfo), typeof(EllipseInfo), typeof(PolygonInfo) });
-            var allShapesInfo = new ShapeInfo[allShapes.Count];
-            for (int i=0;i<allShapes.Count;i++)
-            {
-                if (allShapes[i] is Circle)
-                {
-                    allShapesInfo[i] = new CircleInfo(allShapes[i] as Circle);
-                }
-                else if (allShapes[i] is Ellipse)
-                {
-                    allShapesInfo[i] = new EllipseInfo(allShapes[i] as Ellipse);
-                }
-                else if (allShapes[i] is Polygon)
-                {
-                    allShapesInfo[i] = new PolygonInfo(allShapes[i] as Polygon);
-                }
-            }
-
-            using (FileStream fs = new FileStream("shapes.sav", FileMode.OpenOrCreate))
-            {
-                serializer.WriteObject(fs, allShapesInfo);
+                this.points.Add(new float[2] { p.points[i].x, p.points[i].y });
             }
         }
     }
+
 }
