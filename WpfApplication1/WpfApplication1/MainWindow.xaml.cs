@@ -12,8 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using System.Runtime.Serialization.Json;
-using System.Runtime.Serialization;
+using Newtonsoft.Json;
 using System.IO;
 using Shapes;
 
@@ -24,9 +23,13 @@ namespace WpfApplication1
     /// </summary>
     public partial class MainWindow : Window
     {
+        private SaveData data;
+
         public MainWindow()
         {
             InitializeComponent();
+
+            //panel = this.GetTemplateChild("panel") as StackPanel;
         }
 
         private void MenuItem_Click(object sender, RoutedEventArgs e)
@@ -38,19 +41,45 @@ namespace WpfApplication1
             {
                 string fileName = openDialog.FileName;
 
-                using (FileStream fs = new FileStream(fileName, FileMode.Open))
+                using (StreamReader fs = new StreamReader(fileName))
                 {
-                    var serializer = new DataContractJsonSerializer(typeof(ShapeInfo[]), new List<Type>() { typeof(ShapeInfo), typeof(CircleInfo), typeof(EllipseInfo), typeof(PolygonInfo) });
+                    string file = fs.ReadToEnd();
 
-                    var shapes = new ShapeInfo[100];
-                    shapes = (ShapeInfo[])serializer.ReadObject(fs);
+                    var shapes = JsonConvert.DeserializeObject<SaveData>(file);
 
-                    foreach(var s in shapes)
-                    {
-                        Console.WriteLine(s.GetType());
-                    }
+                    //foreach (var s in shapes)
+                    //{
+                    //    Console.WriteLine(s.GetType());
+                    //}
+                    data = shapes;
+                }
+
+                foreach (var c in data.circles)
+                {
+                    DrawCircle(c);
                 }
             }
+        }
+
+        private void DrawCircle(CircleInfo c)
+        {
+            //var stPanel = new StackPanel();
+            var ell = new System.Windows.Shapes.Ellipse();
+            ell.StrokeThickness = 2;
+            ell.Stroke = Brushes.Black;
+            ell.Height = 100;
+            ell.Width = 100;
+            //ell.Margin
+            panel.Children.Add(ell);
+
+            //this.Content = stPanel;
+        }
+
+        private void DrawEllipse(EllipseInfo e)
+        {
+            var ell = new System.Windows.Shapes.Ellipse();
+            ell.StrokeThickness = 2;
+            ell.Stroke = Brushes.Black;
         }
 
         private void MenuItem_Click_1(object sender, RoutedEventArgs e)

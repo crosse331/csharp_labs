@@ -64,4 +64,11 @@ namespace Shapes
             }
         }
     }
+
+    class SaveData
+    {
+        public List<CircleInfo> circles = new List<CircleInfo>();
+        public List<EllipseInfo> ellipses = new List<EllipseInfo>();
+        public List<PolygonInfo> polygons = new List<PolygonInfo>();
+    }
 }

@@ -7,10 +7,11 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525">
     <Grid>
-        <Menu x:Name="menu" HorizontalAlignment="Left" Height="22" VerticalAlignment="Top" Width="517">
+        <Menu x:Name="menu" Height="22" VerticalAlignment="Top">
             <MenuItem Header="Load" Click="MenuItem_Click"/>
             <MenuItem Header="Save" Click="MenuItem_Click_1"/>
         </Menu>
+        <StackPanel Name="panel" HorizontalAlignment="Left" Height="283" Margin="10,27,0,0" VerticalAlignment="Top" Width="497"/>
 
     </Grid>
 </Window>

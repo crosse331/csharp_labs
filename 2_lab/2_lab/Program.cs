@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.Serialization.Json;
+using Newtonsoft.Json;
 
 using System.IO;
 
@@ -126,7 +127,7 @@ namespace Shapes
         private void Calculate(Vec2f F1, Vec2f F2, float bigO)
         {
             this.a = bigO / 2;
-            var c = Math.Pow((Math.Pow(F1.x - F2.x, 2) + Math.Pow(F1.y - F2.y, 2)), 0.5d)/2;
+            var c = Math.Pow((Math.Pow(F1.x - F2.x, 2) + Math.Pow(F1.y - F2.y, 2)), 0.5d) / 2;
             var e = c / a;
             var tmp = a;
             tmp *= (float)Math.Pow(1 - Math.Pow(e, 2), 0.5d);
@@ -395,9 +396,9 @@ namespace Shapes
             int count = Convert.ToInt32(input);
             int k = 0;
             var points = new List<Vec2f>();
-            while (k<count)
+            while (k < count)
             {
-                Console.WriteLine(string.Format("Please enter point ({0}/{1}) coord in format: x y", k+1, count));
+                Console.WriteLine(string.Format("Please enter point ({0}/{1}) coord in format: x y", k + 1, count));
                 input = Console.ReadLine();
                 var res = input.Split(' ');
                 if (res.Length != 2)
@@ -417,25 +418,29 @@ namespace Shapes
         {
             var serializer = new DataContractJsonSerializer(typeof(ShapeInfo[]), new List<Type>() { typeof(ShapeInfo), typeof(CircleInfo), typeof(EllipseInfo), typeof(PolygonInfo) });
             var allShapesInfo = new ShapeInfo[allShapes.Count];
-            for (int i=0;i<allShapes.Count;i++)
+            var save = new SaveData();
+            for (int i = 0; i < allShapes.Count; i++)
             {
                 if (allShapes[i] is Circle)
                 {
-                    allShapesInfo[i] = new CircleInfo(allShapes[i] as Circle);
+                    save.circles.Add(new CircleInfo(allShapes[i] as Circle));
                 }
                 else if (allShapes[i] is Ellipse)
                 {
-                    allShapesInfo[i] = new EllipseInfo(allShapes[i] as Ellipse);
+                    save.ellipses.Add(new EllipseInfo(allShapes[i] as Ellipse));
                 }
                 else if (allShapes[i] is Polygon)
                 {
-                    allShapesInfo[i] = new PolygonInfo(allShapes[i] as Polygon);
+                    save.polygons.Add(new PolygonInfo(allShapes[i] as Polygon));
                 }
             }
 
-            using (FileStream fs = new FileStream("shapes.sav", FileMode.OpenOrCreate))
+
+
+            using (StreamWriter fs = new StreamWriter("shapes.sav"))
             {
-                serializer.WriteObject(fs, allShapesInfo);
+                string json = JsonConvert.SerializeObject(save);
+                fs.Write(json);
             }
         }
     }

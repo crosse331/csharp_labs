@@ -276,7 +276,7 @@ namespace Shapes
     abstract class ShapeInfo
     {
         [DataMemberAttribute]
-        public float[] pos = new float[2];
+        public float[] pos = new float[100];
     }
 
     [DataContractAttribute]
@@ -284,6 +284,10 @@ namespace Shapes
     {
         [DataMemberAttribute]
         public float radius;
+        public CircleInfo()
+        {
+
+        }
         public CircleInfo(Circle c)
         {
             this.pos[0] = c.pos.x;
@@ -296,11 +300,16 @@ namespace Shapes
     class EllipseInfo : ShapeInfo
     {
         [DataMemberAttribute]
-        public float[] f1 = new float[2];
+        public float[] f1 = new float[100];
         [DataMemberAttribute]
-        public float[] f2 = new float[2];
+        public float[] f2 = new float[100];
         [DataMemberAttribute]
         public float bigO;
+
+        public EllipseInfo()
+        {
+
+        }
 
         public EllipseInfo(Ellipse e)
         {
@@ -319,6 +328,11 @@ namespace Shapes
         [DataMemberAttribute]
         public List<float[]> points = new List<float[]>();
 
+        public PolygonInfo()
+        {
+
+        }
+
         public PolygonInfo(Polygon p)
         {
             //this.points = new float[p.points.Count, 2];
@@ -327,6 +341,13 @@ namespace Shapes
                 this.points.Add(new float[2] { p.points[i].x, p.points[i].y });
             }
         }
+    }
+
+    class SaveData
+    {
+        public List<CircleInfo> circles = new List<CircleInfo>();
+        public List<EllipseInfo> ellipses = new List<EllipseInfo>();
+        public List<PolygonInfo> polygons = new List<PolygonInfo>();
     }
 
 }
