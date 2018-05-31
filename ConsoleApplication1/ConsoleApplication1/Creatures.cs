@@ -14,6 +14,8 @@ namespace ConsoleApplication1
         public char symbol { get; protected set; }
         public RLColor color { get; protected set; }
 
+        protected Vector prevPos;
+
         public Creature(char s, Vector pos)
         {
             this.symbol = s;
@@ -32,9 +34,15 @@ namespace ConsoleApplication1
             CreaturesContainer.AddCreature(this);
         }
 
-        public void TryToMove(Vector dir)
+        public virtual void TryToMove(Vector dir)
         {
-            //iteract with map
+            prevPos = this.position;
+            var world = Program.mainWorld;
+            if (world.CheckPosition(this.position + dir))
+            {
+                world.Move(this.position, this.position + dir);
+                this.position = this.position + dir;
+            }
         }
 
         public virtual void MovingLogic()
@@ -62,10 +70,55 @@ namespace ConsoleApplication1
             {
                 switch (keyPress.Key)
                 {
-                    case RLKey.Up: this.position += Vector.Up; break;
-                    case RLKey.Down: this.position -= Vector.Up; break;
-                    case RLKey.Left: this.position -= Vector.Right; break;
-                    case RLKey.Right: this.position += Vector.Right; break;
+                    case RLKey.Up: this.TryToMove(Vector.Up); break;
+                    case RLKey.Down: this.TryToMove(-Vector.Up); break;
+                    case RLKey.Left: this.TryToMove(-Vector.Right); break;
+                    case RLKey.Right: this.TryToMove(Vector.Right); break;
+                }
+            }
+        }
+    }
+
+    public class TestEnemy : Creature
+    {
+        public TestEnemy(char s, Vector pos) : base(s, pos) { }
+        public TestEnemy(char s, Vector pos, RLColor c) : base(s, pos, c) { }
+
+        private Random randomizer = new Random();
+
+        public override void MovingLogic()
+        {
+            base.MovingLogic();
+
+            int rnd = randomizer.Next(0, 100);
+            if (rnd < 25)
+            {
+                this.TryToMove(-Vector.Right);
+            }
+            else if (rnd < 50)
+            {
+                this.TryToMove(Vector.Up);
+            }
+            else if (rnd < 75)
+            {
+                this.TryToMove(Vector.Right);
+            }
+            else if (rnd < 100)
+            {
+                this.TryToMove(-Vector.Up);
+            }
+        }
+
+        public override void TryToMove(Vector dir)
+        {
+            base.TryToMove(dir);
+
+            if (this.prevPos == this.position)
+            {
+                var crea = CreaturesContainer.GetCreatureOnPosition(this.position + dir);
+                if (crea != null)
+                {
+
                 }
             }
         }
@@ -82,7 +135,7 @@ namespace ConsoleApplication1
 
         public static void MovingLogic()
         {
-            for (int i=0;i<allCreatures.Count;i++)
+            for (int i = 0; i < allCreatures.Count; i++)
             {
                 allCreatures[i].MovingLogic();
             }
@@ -90,10 +143,24 @@ namespace ConsoleApplication1
 
         public static void RenderLogic(RLConsole console)
         {
-            for (int i=0;i<allCreatures.Count;i++)
+            for (int i = 0; i < allCreatures.Count; i++)
             {
                 allCreatures[i].Render(console);
             }
+        }
+
+        public static Creature GetCreatureOnPosition(Vector pos)
+        {
+            Creature result = null;
+            for (int i = 0; i < allCreatures.Count; i++)
+            {
+                if (allCreatures[i].position == pos)
+                {
+                    result = allCreatures[i];
+                }
+            }
+
+            return result;
         }
     }
 }
