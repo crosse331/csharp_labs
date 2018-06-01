@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using RLNET;
+using NewLogic;
 
 namespace ConsoleApplication1
 {
@@ -13,6 +14,14 @@ namespace ConsoleApplication1
         public Vector position { get; protected set; }
         public char symbol { get; protected set; }
         public RLColor color { get; protected set; }
+
+        public int movingDelay = 10;
+        private bool canAction = true;
+
+        public Stat Hp = new Stat(350);
+        public Stat Energy = new Stat(300);
+
+        private List<Timer> timers = new List<Timer>();
 
         protected Vector prevPos;
 
@@ -36,12 +45,18 @@ namespace ConsoleApplication1
 
         public virtual void TryToMove(Vector dir)
         {
+            if (!this.canAction)
+            {
+                return;
+            }
             prevPos = this.position;
             var world = Program.mainWorld;
             if (world.CheckPosition(this.position + dir))
             {
                 world.Move(this.position, this.position + dir);
                 this.position = this.position + dir;
+                this.canAction = false;
+                var timer = new Timer(this.symbol.ToString(), movingDelay, () => { this.canAction = true; });
             }
         }
 
@@ -70,10 +85,10 @@ namespace ConsoleApplication1
             {
                 switch (keyPress.Key)
                 {
-                    case RLKey.Up: this.TryToMove(Vector.Up); break;
-                    case RLKey.Down: this.TryToMove(-Vector.Up); break;
-                    case RLKey.Left: this.TryToMove(-Vector.Right); break;
-                    case RLKey.Right: this.TryToMove(Vector.Right); break;
+                    case RLKey.W: this.TryToMove(Vector.Up); break;
+                    case RLKey.S: this.TryToMove(-Vector.Up); break;
+                    case RLKey.A: this.TryToMove(-Vector.Right); break;
+                    case RLKey.D: this.TryToMove(Vector.Right); break;
                 }
             }
         }
@@ -124,43 +139,6 @@ namespace ConsoleApplication1
         }
     }
 
-    public static class CreaturesContainer
-    {
-        public static List<Creature> allCreatures = new List<Creature>();
+    
 
-        public static void AddCreature(Creature c)
-        {
-            allCreatures.Add(c);
-        }
-
-        public static void MovingLogic()
-        {
-            for (int i = 0; i < allCreatures.Count; i++)
-            {
-                allCreatures[i].MovingLogic();
-            }
-        }
-
-        public static void RenderLogic(RLConsole console)
-        {
-            for (int i = 0; i < allCreatures.Count; i++)
-            {
-                allCreatures[i].Render(console);
-            }
-        }
-
-        public static Creature GetCreatureOnPosition(Vector pos)
-        {
-            Creature result = null;
-            for (int i = 0; i < allCreatures.Count; i++)
-            {
-                if (allCreatures[i].position == pos)
-                {
-                    result = allCreatures[i];
-                }
-            }
-
-            return result;
-        }
-    }
 }

@@ -68,4 +68,48 @@ namespace ConsoleApplication1
             return !(v1 == v2);
         }
     }
+
+    public struct Rect
+    {
+        public Vector Pos;
+        public Vector Size;
+
+        public Rect(int x, int y, int w, int h)
+        {
+            this.Pos = new Vector(x, y);
+            this.Size = new Vector(w, h);
+        }
+    }
+
+    public class Timer
+    {
+        public string name { get; }
+        public int ticks = 0;
+        public int finalTick = 0;
+        public Action onFinish = null;
+
+        public Timer(string n, int t, Action onF)
+        {
+            this.name = n;
+            this.finalTick = t;
+            this.onFinish += onF;
+
+            TimersContainer.AddTimer(this);
+        }
+
+        public void Logic()
+        {
+            this.ticks++;
+            if (this.ticks >= finalTick)
+            {
+                if (onFinish!=null)
+                {
+                    onFinish();
+                    onFinish = null;
+                }
+                TimersContainer.Remove(this);
+            }
+            
+        }
+    }
 }
