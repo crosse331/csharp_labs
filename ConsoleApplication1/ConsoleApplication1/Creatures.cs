@@ -5,21 +5,25 @@ using System.Text;
 using System.Threading.Tasks;
 
 using RLNET;
-using NewLogic;
+using MathLogic;
 
 namespace ConsoleApplication1
 {
     public class Creature
     {
         public Vector position { get; protected set; }
+        public Vector facing { get; protected set; }
         public char symbol { get; protected set; }
         public RLColor color { get; protected set; }
 
         public int movingDelay = 10;
-        private bool canAction = true;
+        private bool canMove = true;
+        private bool canAttack = true;
 
         public Stat Hp = new Stat(350);
         public Stat Energy = new Stat(300);
+
+        private bool isRestoringStamina = true;
 
         private List<Timer> timers = new List<Timer>();
 
@@ -31,7 +35,7 @@ namespace ConsoleApplication1
             this.position = pos;
             this.color = RLColor.White;
 
-            CreaturesContainer.AddCreature(this);
+            CreaturesContainer.Add(this);
         }
 
         public Creature(char s, Vector pos, RLColor c)
@@ -40,12 +44,12 @@ namespace ConsoleApplication1
             this.position = pos;
             this.color = c;
 
-            CreaturesContainer.AddCreature(this);
+            CreaturesContainer.Add(this);
         }
 
         public virtual void TryToMove(Vector dir)
         {
-            if (!this.canAction)
+            if (!this.canMove)
             {
                 return;
             }
@@ -55,19 +59,45 @@ namespace ConsoleApplication1
             {
                 world.Move(this.position, this.position + dir);
                 this.position = this.position + dir;
-                this.canAction = false;
-                var timer = new Timer(this.symbol.ToString(), movingDelay, () => { this.canAction = true; });
+                this.facing = dir;
+                this.canMove = false;
+                var timer = new Timer(this.symbol.ToString(), movingDelay, () => { this.canMove = true; });
             }
+        }
+
+        public virtual void TryToAttack(Vector dir)
+        {
+            this.facing = dir;
+
+            if (!this.canAttack)
+            {
+                return;
+            }
+
+            var attack = new Attack(AttackType.Melee, this.position, this.facing, 25, this);
+            this.Energy -= 30;
+            this.isRestoringStamina = false;
+            this.canAttack = false;
+            var timer = new Timer("restStam", attack.ticks, 
+                () => { this.isRestoringStamina = true; this.canAttack = true; });
         }
 
         public virtual void MovingLogic()
         {
-
+            if (this.isRestoringStamina)
+            {
+                this.Energy += 2;
+            }
         }
 
         public virtual void Render(RLConsole console)
         {
             console.Print(this.position.X, this.position.Y, this.symbol.ToString(), this.color);
+        }
+
+        public virtual void GetDamaged(Attack att)
+        {
+            this.Hp -= att.damage;
         }
     }
 
@@ -89,6 +119,12 @@ namespace ConsoleApplication1
                     case RLKey.S: this.TryToMove(-Vector.Up); break;
                     case RLKey.A: this.TryToMove(-Vector.Right); break;
                     case RLKey.D: this.TryToMove(Vector.Right); break;
+
+                    case RLKey.Up: this.TryToAttack(Vector.Up); break;
+                    case RLKey.Down: this.TryToAttack(-Vector.Up); break;
+                    case RLKey.Left: this.TryToAttack(-Vector.Right); break;
+                    case RLKey.Right: this.TryToAttack(Vector.Right); break;
+
                 }
             }
         }
@@ -139,6 +175,5 @@ namespace ConsoleApplication1
         }
     }
 
-    
 
 }

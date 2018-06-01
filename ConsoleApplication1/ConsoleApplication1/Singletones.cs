@@ -8,68 +8,96 @@ using RLNET;
 
 namespace ConsoleApplication1
 {
-    public static class CreaturesContainer
+    public class Container<T>
     {
-        public static List<Creature> allCreatures = new List<Creature>();
+        protected static List<T> container = new List<T>();
 
-        public static void AddCreature(Creature c)
+        public static void Add(T item)
         {
-            allCreatures.Add(c);
+            container.Add(item);
         }
 
+        public static void Remove(T item)
+        {
+            if (container.Contains(item))
+            {
+                container.Remove(item);
+            }
+        }
+    }
+
+    public class CreaturesContainer : Container<Creature>
+    {
         public static void MovingLogic()
         {
-            for (int i = 0; i < allCreatures.Count; i++)
+            for (int i = 0; i < container.Count; i++)
             {
-                allCreatures[i].MovingLogic();
+                container[i].MovingLogic();
             }
         }
 
         public static void RenderLogic(RLConsole console)
         {
-            for (int i = 0; i < allCreatures.Count; i++)
+            for (int i = 0; i < container.Count; i++)
             {
-                allCreatures[i].Render(console);
+                container[i].Render(console);
             }
         }
 
         public static Creature GetCreatureOnPosition(Vector pos)
         {
             Creature result = null;
-            for (int i = 0; i < allCreatures.Count; i++)
+            for (int i = 0; i < container.Count; i++)
             {
-                if (allCreatures[i].position == pos)
+                if (container[i].position == pos)
                 {
-                    result = allCreatures[i];
+                    result = container[i];
                 }
             }
 
             return result;
         }
+
+        public static Player GetPlayer()
+        {
+            for (int i=0;i< container.Count;i++)
+            {
+                if (container[i] is Player)
+                {
+                    return container[i] as Player;
+                }
+            }
+
+            return null;
+        }
     }
 
-    public static class TimersContainer
+    public  class TimersContainer : Container<Timer>
     {
-        public static List<Timer> allTimers = new List<Timer>();
-
-        public static void AddTimer(Timer t)
-        {
-            allTimers.Add(t);
-        }
-
         public static void Logic()
         {
-            for (int i = 0; i < allTimers.Count; i++)
+            for (int i = 0; i < container.Count; i++)
             {
-                allTimers[i].Logic();
+                container[i].Logic();
+            }
+        }
+    }
+
+    public class AttacksContainer : Container<Attack>
+    {
+        public static void Logic()
+        {
+            for (int i=0;i<container.Count;i++)
+            {
+                container[i].Logic();
             }
         }
 
-        public static void Remove(Timer t)
+        public static void Render(RLConsole console)
         {
-            if (allTimers.Contains(t))
+            for (int i = 0; i < container.Count; i++)
             {
-                allTimers.Remove(t);
+                container[i].Render(console);
             }
         }
     }

@@ -52,6 +52,7 @@ namespace ConsoleApplication1
         {
             CreaturesContainer.MovingLogic();
             TimersContainer.Logic();
+            AttacksContainer.Logic();
 
         }
 
@@ -67,6 +68,7 @@ namespace ConsoleApplication1
 
             mainWorld.Render(worldConsole);
             CreaturesContainer.RenderLogic(worldConsole);
+            AttacksContainer.Render(worldConsole);
             mainHud.Render(statsConsole);
 
             MainConsole.Draw();
@@ -77,8 +79,10 @@ namespace ConsoleApplication1
     {
         private const int WALL = 219;
 
-        private int[,] map = new int[50, 50];
+        private int[,] map = new int[50, 35];
         private Random randomizer = new Random();
+
+        public static Vector cameraPosition { get; private set; }
 
         public World()
         {
@@ -87,11 +91,11 @@ namespace ConsoleApplication1
 
         public void Generate()
         {
-            for (int i = 0; i < 50; i++)
+            for (int i = 0; i < map.GetLength(0); i++)
             {
-                for (int j = 0; j < 50; j++)
+                for (int j = 0; j < map.GetLength(1); j++)
                 {
-                    if (i == 0 || j == 0 || i == 49 || j == 49)
+                    if (i == 0 || j == 0 || i == map.GetLength(0) - 1 || j == map.GetLength(1) - 1)
                     {
                         map[i, j] = WALL;
                     }
@@ -108,9 +112,9 @@ namespace ConsoleApplication1
 
         public void Render(RLConsole console)
         {
-            for (int i = 0; i < 50; i++)
+            for (int i = 0; i < map.GetLength(0); i++)
             {
-                for (int j = 0; j < 50; j++)
+                for (int j = 0; j < map.GetLength(1); j++)
                 {
                     console.Print(i, j, ((char)(map[i, j] > 0 ? map[i, j] : 0)).ToString(), RLColor.White);
                 }

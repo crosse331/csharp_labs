@@ -94,7 +94,7 @@ namespace ConsoleApplication1
             this.finalTick = t;
             this.onFinish += onF;
 
-            TimersContainer.AddTimer(this);
+            TimersContainer.Add(this);
         }
 
         public void Logic()

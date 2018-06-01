@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using NewLogic;
+using MathLogic;
 using RLNET;
 
 namespace ConsoleApplication1
@@ -18,6 +18,8 @@ namespace ConsoleApplication1
 
         public Creature target;
 
+        private int hpCount = 0;
+
         public StatsPanel(Creature target)
         {
             this.target = target;
@@ -28,18 +30,19 @@ namespace ConsoleApplication1
             int hpLenght = (int)target.Hp.GetMax() / 50;
             int enLenght = (int)target.Energy.GetMax() / 50;
 
-            int hpCount = (int)Math.Round((double)target.Hp.GetCurrentCoef()) * hpLenght;
-            int enCount = (int)Math.Round((double)target.Energy.GetCurrentCoef()) * enLenght;
+            hpCount = (int)(Math.Round((double)target.Hp.GetCurrentCoef() * hpLenght));
+            int enCount = (int)(Math.Round((double)target.Energy.GetCurrentCoef() * enLenght));
 
             string hpStr = "";
-            for (int i = 0; i < hpCount; i++)
+            for (int i = 0; i < hpLenght; i++)
             {
-                hpStr += ((char)PROGRESS_BAR).ToString();
+                hpStr += i < hpCount ? ((char)PROGRESS_BAR).ToString() : " ";
+                //hpStr += ((char)PROGRESS_BAR).ToString();
             }
             string enStr = "";
-            for (int i = 0; i < enCount; i++)
+            for (int i = 0; i < enLenght; i++)
             {
-                enStr += ((char)PROGRESS_BAR).ToString();
+                enStr += i < enCount ? ((char)PROGRESS_BAR).ToString() : " ";
             }
             console.Print(1, 1, hpStr, RLColor.Red);
             console.Print(1, 2, enStr, RLColor.Green);

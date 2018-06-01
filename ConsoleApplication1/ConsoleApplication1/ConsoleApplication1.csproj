@@ -61,6 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Creatures.cs" />
+    <Compile Include="GameLogic.cs" />
     <Compile Include="Gui.cs" />
     <Compile Include="Logic.cs" />
     <Compile Include="NewLogic.cs" />

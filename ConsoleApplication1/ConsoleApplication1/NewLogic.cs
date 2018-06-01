@@ -2,9 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace NewLogic
+namespace MathLogic
 {
-    public static class NewLogic
+    public static class MathLogic
     {
         static Random randomizer = new Random();
         public static T GetRandomElement<T>(List<T> list)
