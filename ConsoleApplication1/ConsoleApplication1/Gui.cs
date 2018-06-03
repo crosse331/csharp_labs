@@ -28,10 +28,10 @@ namespace ConsoleApplication1
         public void Render(RLConsole console)
         {
             int hpLenght = (int)target.Hp.GetMax() / 50;
-            int enLenght = (int)target.Energy.GetMax() / 50;
+            int enLenght = (int)target.Stamina.GetMax() / 50;
 
             hpCount = (int)(Math.Round((double)target.Hp.GetCurrentCoef() * hpLenght));
-            int enCount = (int)(Math.Round((double)target.Energy.GetCurrentCoef() * enLenght));
+            int enCount = (int)(Math.Round((double)target.Stamina.GetCurrentCoef() * enLenght));
 
             string hpStr = "";
             for (int i = 0; i < hpLenght; i++)

@@ -37,7 +37,7 @@ namespace ConsoleApplication1
 
         private Vector realPos;
 
-        public int ticks = 20;
+        public int ticks = 15;
 
         private char symbol = (char)47;
 

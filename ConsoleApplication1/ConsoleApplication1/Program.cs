@@ -25,7 +25,7 @@ namespace ConsoleApplication1
         static void Main(string[] args)
         {
             MainConsole = new RLRootConsole("terminal8x8.png", 
-                mainConsoleSize.Size.X, mainConsoleSize.Size.Y, 8, 8, 1, "Coop roguelike");
+                mainConsoleSize.Size.X, mainConsoleSize.Size.Y, 8, 8, 2, "Coop roguelike");
 
             statsConsole = new RLConsole(statsConsoleRect.Size.X, statsConsoleRect.Size.Y);
             worldConsole = new RLConsole(worldConsoleRect.Size.X, worldConsoleRect.Size.Y);
@@ -101,10 +101,10 @@ namespace ConsoleApplication1
                     }
                     else
                     {
-                        if (randomizer.Next(0, 100) > 85)
-                        {
-                            map[i, j] = WALL;
-                        }
+                        //if (randomizer.Next(0, 100) > 85)
+                        //{
+                        //    map[i, j] = WALL;
+                        //}
                     }
                 }
             }

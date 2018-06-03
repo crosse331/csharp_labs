@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using Newtonsoft.Json;
 using System.IO;
 using Shapes;
+using OxyPlot;
 
 namespace WpfApplication1
 {
@@ -29,6 +30,12 @@ namespace WpfApplication1
         {
             InitializeComponent();
 
+            var ls = new OxyPlot.LineSeries();
+            for (int i=0;i<10;i++)
+            {
+                ls.Points.Add(new DataPoint(i, -i));
+            }
+            this.AddChild(ls);
             //panel = this.GetTemplateChild("panel") as StackPanel;
         }
 
@@ -58,6 +65,12 @@ namespace WpfApplication1
                 {
                     DrawCircle(c);
                 }
+                foreach (var ell in data.ellipses)
+                {
+                    DrawEllipse(ell);
+                }
+
+                
             }
         }
 
@@ -80,6 +93,12 @@ namespace WpfApplication1
             var ell = new System.Windows.Shapes.Ellipse();
             ell.StrokeThickness = 2;
             ell.Stroke = Brushes.Black;
+            Shapes.Ellipse myEll = new Shapes.Ellipse(new Vec2f(e.f1[0], e.f1[1]),
+                new Vec2f(e.f2[0], e.f2[1]), e.bigO);
+            ell.Height = myEll.a * 2 * 100;
+            ell.Width = myEll.b * 2 * 100;
+
+            panel.Children.Add(ell);
         }
 
         private void MenuItem_Click_1(object sender, RoutedEventArgs e)

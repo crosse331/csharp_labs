@@ -21,9 +21,10 @@ namespace ConsoleApplication1
         private bool canAttack = true;
 
         public Stat Hp = new Stat(350);
-        public Stat Energy = new Stat(300);
+        public Stat Stamina = new Stat(300);
 
         private bool isRestoringStamina = true;
+        private Timer staminaTimer = null;
 
         private List<Timer> timers = new List<Timer>();
 
@@ -35,6 +36,8 @@ namespace ConsoleApplication1
             this.position = pos;
             this.color = RLColor.White;
 
+            this.Init();
+
             CreaturesContainer.Add(this);
         }
 
@@ -44,12 +47,19 @@ namespace ConsoleApplication1
             this.position = pos;
             this.color = c;
 
+            this.Init();
+
             CreaturesContainer.Add(this);
+        }
+
+        protected virtual void Init()
+        {
+
         }
 
         public virtual void TryToMove(Vector dir)
         {
-            if (!this.canMove)
+            if (!this.canMove || !this.canAttack)
             {
                 return;
             }
@@ -69,24 +79,31 @@ namespace ConsoleApplication1
         {
             this.facing = dir;
 
-            if (!this.canAttack)
+            if (!this.canAttack || this.Stamina.GetCurrent() < 30)
             {
                 return;
             }
 
             var attack = new Attack(AttackType.Melee, this.position, this.facing, 25, this);
-            this.Energy -= 30;
+            this.Stamina -= 30;
             this.isRestoringStamina = false;
             this.canAttack = false;
-            var timer = new Timer("restStam", attack.ticks, 
-                () => { this.isRestoringStamina = true; this.canAttack = true; });
+            if (this.staminaTimer != null)
+            {
+                TimersContainer.Remove(this.staminaTimer);
+                this.staminaTimer = null;
+            }
+            this.staminaTimer = new Timer("restStam", attack.ticks,
+                () => { this.isRestoringStamina = true; });
+            new Timer("restCanAttack", attack.ticks - 3,
+                () => { this.canAttack = true; });
         }
 
         public virtual void MovingLogic()
         {
             if (this.isRestoringStamina)
             {
-                this.Energy += 2;
+                this.Stamina += 2;
             }
         }
 
@@ -98,6 +115,10 @@ namespace ConsoleApplication1
         public virtual void GetDamaged(Attack att)
         {
             this.Hp -= att.damage;
+            if (this.Hp.GetCurrent()<=0)
+            {
+                CreaturesContainer.Remove(this);
+            }
         }
     }
 
@@ -106,6 +127,15 @@ namespace ConsoleApplication1
         public Player(char s, Vector pos) : base(s, pos) { }
         public Player(char s, Vector pos, RLColor c) : base(s, pos, c) { }
 
+        private RLKey lastPressedKey = RLKey.Unknown;
+
+        protected override void Init()
+        {
+            base.Init();
+
+            this.movingDelay = 2;
+        }
+
         public override void MovingLogic()
         {
             base.MovingLogic();
@@ -113,6 +143,11 @@ namespace ConsoleApplication1
             var keyPress = Program.MainConsole.Keyboard.GetKeyPress();
             if (keyPress != null)
             {
+                if (keyPress.Key == lastPressedKey || keyPress.Repeating)
+                {
+                    return;
+                }
+                lastPressedKey = keyPress.Key;
                 switch (keyPress.Key)
                 {
                     case RLKey.W: this.TryToMove(Vector.Up); break;
@@ -124,8 +159,11 @@ namespace ConsoleApplication1
                     case RLKey.Down: this.TryToAttack(-Vector.Up); break;
                     case RLKey.Left: this.TryToAttack(-Vector.Right); break;
                     case RLKey.Right: this.TryToAttack(Vector.Right); break;
-
                 }
+            }
+            else
+            {
+                lastPressedKey = RLKey.Unknown;
             }
         }
     }
@@ -136,6 +174,13 @@ namespace ConsoleApplication1
         public TestEnemy(char s, Vector pos, RLColor c) : base(s, pos, c) { }
 
         private Random randomizer = new Random();
+
+        protected override void Init()
+        {
+            base.Init();
+
+            this.movingDelay = 10;
+        }
 
         public override void MovingLogic()
         {
