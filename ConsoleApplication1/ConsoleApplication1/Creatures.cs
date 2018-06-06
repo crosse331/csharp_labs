@@ -13,8 +13,8 @@ namespace ConsoleApplication1
     {
         public Vector position { get; protected set; }
         public Vector facing { get; protected set; }
-        public char symbol { get; protected set; }
-        public RLColor color { get; protected set; }
+        public char symbol { get; set; }
+        public RLColor color { get; set; }
 
         public int movingDelay = 10;
         private bool canMove = true;
@@ -29,6 +29,8 @@ namespace ConsoleApplication1
         private List<Timer> timers = new List<Timer>();
 
         protected Vector prevPos;
+
+        protected Animation currentAnimation = null;
 
         public Creature(char s, Vector pos)
         {
@@ -84,19 +86,24 @@ namespace ConsoleApplication1
                 return;
             }
 
-            var attack = new Attack(AttackType.Melee, this.position, this.facing, 25, this);
-            this.Stamina -= 30;
-            this.isRestoringStamina = false;
             this.canAttack = false;
-            if (this.staminaTimer != null)
-            {
-                TimersContainer.Remove(this.staminaTimer);
-                this.staminaTimer = null;
-            }
-            this.staminaTimer = new Timer("restStam", attack.ticks,
-                () => { this.isRestoringStamina = true; });
-            new Timer("restCanAttack", attack.ticks - 3,
-                () => { this.canAttack = true; });
+            this.isRestoringStamina = false;
+
+            this.currentAnimation = new Animation(new List<char>() { '!' }, 30, this, () =>
+             {
+                 var attack = new Attack(AttackType.Melee, this.position, this.facing, 25, this);
+                 this.Stamina -= 30;     
+                 if (this.staminaTimer != null)
+                 {
+                     TimersContainer.Remove(this.staminaTimer);
+                     this.staminaTimer = null;
+                 }
+                 this.staminaTimer = new Timer("restStam", attack.ticks,
+                     () => { this.isRestoringStamina = true; });
+                 new Timer("restCanAttack", attack.ticks - 3,
+                     () => { this.canAttack = true; });
+                 this.currentAnimation = null;
+             });
         }
 
         public virtual void MovingLogic()
@@ -109,13 +116,17 @@ namespace ConsoleApplication1
 
         public virtual void Render(RLConsole console)
         {
+            if (this.currentAnimation != null)
+            {
+                this.currentAnimation.Render();
+            }
             console.Print(this.position.X, this.position.Y, this.symbol.ToString(), this.color);
         }
 
         public virtual void GetDamaged(Attack att)
         {
             this.Hp -= att.damage;
-            if (this.Hp.GetCurrent()<=0)
+            if (this.Hp.GetCurrent() <= 0)
             {
                 CreaturesContainer.Remove(this);
             }

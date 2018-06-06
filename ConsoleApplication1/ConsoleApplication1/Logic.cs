@@ -112,4 +112,59 @@ namespace ConsoleApplication1
             
         }
     }
+
+    public class Animation
+    {
+        public List<char> animChars = new List<char>();
+        private int time = 0;
+        private Creature owner = null;
+
+        private Timer timer;
+
+        private Action onFinishAction = null;
+
+        private RLNET.RLColor _startColor;
+        private char _startChar;
+
+        public Animation(List<char> list, int tm, Creature ownr, Action onFinish)
+        {
+            for (int i=0;i<list.Count;i++)
+            {
+                this.animChars.Add(list[i]);
+            }
+            this.time = tm;
+            this.owner = ownr;
+
+            this.onFinishAction = onFinish;
+
+            this._startColor = owner.color;
+            this._startChar = owner.symbol;
+
+            this.timer = new Timer(owner.symbol + "'s animation", this.time, OnTimeEnded);
+        }
+
+        public void Render()
+        {
+            if (animChars.Count == 0)
+            {
+
+            }
+            else if (animChars.Count == 1)
+            {
+                this.owner.symbol = this.animChars[0];
+                float percent = (float)this.timer.ticks / this.timer.finalTick;
+                this.owner.color = RLNET.RLColor.White * percent;
+            }
+        }
+
+        public void OnTimeEnded()
+        {
+            this.owner.color = this._startColor;
+            this.owner.symbol = this._startChar;
+            if (onFinishAction!=null)
+            {
+                this.onFinishAction();
+            }
+        }
+    }
 }
