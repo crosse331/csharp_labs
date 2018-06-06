@@ -102,14 +102,14 @@ namespace ConsoleApplication1
             this.ticks++;
             if (this.ticks >= finalTick)
             {
-                if (onFinish!=null)
+                if (onFinish != null)
                 {
                     onFinish();
                     onFinish = null;
                 }
                 TimersContainer.Remove(this);
             }
-            
+
         }
     }
 
@@ -128,7 +128,7 @@ namespace ConsoleApplication1
 
         public Animation(List<char> list, int tm, Creature ownr, Action onFinish)
         {
-            for (int i=0;i<list.Count;i++)
+            for (int i = 0; i < list.Count; i++)
             {
                 this.animChars.Add(list[i]);
             }
@@ -153,7 +153,7 @@ namespace ConsoleApplication1
             {
                 this.owner.symbol = this.animChars[0];
                 float percent = (float)this.timer.ticks / this.timer.finalTick;
-                this.owner.color = RLNET.RLColor.White * percent;
+                this.owner.color = RLNET.RLColor.White * (0.5f + percent * 0.5f);
             }
         }
 
@@ -161,7 +161,7 @@ namespace ConsoleApplication1
         {
             this.owner.color = this._startColor;
             this.owner.symbol = this._startChar;
-            if (onFinishAction!=null)
+            if (onFinishAction != null)
             {
                 this.onFinishAction();
             }

@@ -89,16 +89,16 @@ namespace ConsoleApplication1
             this.canAttack = false;
             this.isRestoringStamina = false;
 
-            this.currentAnimation = new Animation(new List<char>() { '!' }, 30, this, () =>
+            this.currentAnimation = new Animation(new List<char>() { '!' }, 10, this, () =>
              {
                  var attack = new Attack(AttackType.Melee, this.position, this.facing, 25, this);
-                 this.Stamina -= 30;     
+                 this.Stamina -= 30;
                  if (this.staminaTimer != null)
                  {
                      TimersContainer.Remove(this.staminaTimer);
                      this.staminaTimer = null;
                  }
-                 this.staminaTimer = new Timer("restStam", attack.ticks,
+                 this.staminaTimer = new Timer("restStam", attack.ticks + 15,
                      () => { this.isRestoringStamina = true; });
                  new Timer("restCanAttack", attack.ticks - 3,
                      () => { this.canAttack = true; });
