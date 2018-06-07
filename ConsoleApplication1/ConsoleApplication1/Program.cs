@@ -13,146 +13,77 @@ namespace ConsoleApplication1
         public static RLRootConsole MainConsole { get; private set; }
         private static Rect mainConsoleSize = new Rect(0, 0, 60, 40);
 
-        public static RLConsole statsConsole { get; private set; }
-        private static Rect statsConsoleRect = new Rect(0, 0, 20, 5);
-        public static RLConsole worldConsole { get; private set; }
-        private static Rect worldConsoleRect = new Rect(0, 5, 55, 35);
+        public static RLConsole mainMenuConsole { get; private set; }
 
-        private static Hud mainHud;
-
-        public static World mainWorld { get; private set; }
+        private static GameState _curState;
+        public static GameState currentState
+        {
+            get
+            {
+                return _curState;
+            }
+            set
+            {
+                if (value != _curState)
+                {
+                    _curState = value;
+                    _curState.Init();
+                }
+            }
+        }
 
         static void Main(string[] args)
         {
-            MainConsole = new RLRootConsole("terminal8x8.png", 
-                mainConsoleSize.Size.X, mainConsoleSize.Size.Y, 8, 8, 2, "Coop roguelike");
+            MainConsole = new RLRootConsole("terminal8x8.png",
+                mainConsoleSize.Size.X, mainConsoleSize.Size.Y, 8, 8, 1, "Roguelike");
 
-            statsConsole = new RLConsole(statsConsoleRect.Size.X, statsConsoleRect.Size.Y);
-            worldConsole = new RLConsole(worldConsoleRect.Size.X, worldConsoleRect.Size.Y);
-
-            MainConsole.Update += OnRootConsoleUpdate;
-            MainConsole.Render += OnRootConsoleRender;
+            currentState = new MainMenu();
 
             Init();
 
+            MainConsole.Update += OnRootConsoleUpdate;
+            MainConsole.Render += OnRootConsoleRender;
+            
             MainConsole.Run();
         }
 
         private static void Init()
         {
-            var player = new Player((char)2, Vector.One * 10, RLColor.White);/*new RLColor(0.4f, 0.4f, 0.4f));*/
-            var enemy = new TestEnemy((char)1, Vector.One * 15, RLColor.White);
-
-            mainHud = new Hud(player);
-
-            mainWorld = new World();
         }
 
         private static void OnRootConsoleUpdate(object sender, UpdateEventArgs e)
         {
-            CreaturesContainer.MovingLogic();
             TimersContainer.Logic();
-            AttacksContainer.Logic();
 
+            if (currentState!=null)
+            {
+                currentState.Logic();
+            }
         }
 
         private static void OnRootConsoleRender(object sender, UpdateEventArgs e)
         {
             MainConsole.Clear();
             //MainConsole.Print(30, 20, "@", RLColor.White);
-            
-            RLConsole.Blit(statsConsole, 0, 0, statsConsoleRect.Size.X, statsConsoleRect.Size.Y,
-                MainConsole, statsConsoleRect.Pos.X, statsConsoleRect.Pos.Y);
-            RLConsole.Blit(worldConsole, 0, 0, worldConsoleRect.Size.X, worldConsoleRect.Size.Y,
-                MainConsole, worldConsoleRect.Pos.X, worldConsoleRect.Pos.Y);
 
-            mainWorld.Render(worldConsole);
-            CreaturesContainer.RenderLogic(worldConsole);
-            AttacksContainer.Render(worldConsole);
-            mainHud.Render(statsConsole);
+            if (currentState!=null)
+            {
+                currentState.Render(MainConsole);
+            }
 
             MainConsole.Draw();
         }
-    }
 
-    public class World
-    {
-        private const int WALL = 219;
-
-        private int[,] map = new int[50, 35];
-        private Random randomizer = new Random();
-
-        public static Vector cameraPosition { get; private set; }
-
-        public World()
+        public static World GetWorld()
         {
-            this.Generate();
-        }
-
-        public void Generate()
-        {
-            for (int i = 0; i < map.GetLength(0); i++)
+            if (!(currentState is MainGame))
             {
-                for (int j = 0; j < map.GetLength(1); j++)
-                {
-                    if (i == 0 || j == 0 || i == map.GetLength(0) - 1 || j == map.GetLength(1) - 1)
-                    {
-                        map[i, j] = WALL;
-                    }
-                    else
-                    {
-                        //if (randomizer.Next(0, 100) > 85)
-                        //{
-                        //    map[i, j] = WALL;
-                        //}
-                    }
-                }
+                return null;
+            }
+            else
+            {
+                return (currentState as MainGame).mainWorld;
             }
         }
-
-        public void Render(RLConsole console)
-        {
-            for (int i = 0; i < map.GetLength(0); i++)
-            {
-                for (int j = 0; j < map.GetLength(1); j++)
-                {
-                    console.Print(i, j, ((char)(map[i, j] > 0 ? map[i, j] : 0)).ToString(), RLColor.White);
-                }
-            }
-        }
-
-        public bool CheckPosition(Vector pos)
-        {
-            if (map[pos.X, pos.Y] != 0)
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        public void Move(Vector from, Vector to)
-        {
-            map[from.X, from.Y] = 0;
-            map[to.X, to.Y] = -1;
-        }
-    }
-
-    public class Hud
-    {
-        public Creature target;
-        public StatsPanel heroPanel;
-
-        public Hud(Creature tar)
-        {
-            this.target = tar;
-            heroPanel = new StatsPanel(tar);
-        }
-
-        public void Render(RLConsole console)
-        {
-            heroPanel.Render(console);
-        }
-
     }
 }

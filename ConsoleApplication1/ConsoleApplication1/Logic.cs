@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RLNET;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,6 +10,69 @@ namespace ConsoleApplication1
     public static class Logic
     {
 
+    }
+
+    public class World
+    {
+        private const int WALL = 219;
+
+        private int[,] map = new int[50, 35];
+        private Random randomizer = new Random();
+
+        public static Vector cameraPosition { get; private set; }
+
+        public World()
+        {
+            this.Generate();
+        }
+
+        public void Generate()
+        {
+            for (int i = 0; i < map.GetLength(0); i++)
+            {
+                for (int j = 0; j < map.GetLength(1); j++)
+                {
+                    if (i == 0 || j == 0 || i == map.GetLength(0) - 1 || j == map.GetLength(1) - 1)
+                    {
+                        map[i, j] = WALL;
+                    }
+                    else
+                    {
+                        //if (randomizer.Next(0, 100) > 85)
+                        //{
+                        //    map[i, j] = WALL;
+                        //}
+                    }
+                }
+            }
+        }
+
+        public void Render(RLConsole console)
+        {
+            for (int i = 0; i < map.GetLength(0); i++)
+            {
+                for (int j = 0; j < map.GetLength(1); j++)
+                {
+                    console.Print(i, j, ((char)(map[i, j] > 0 ? map[i, j] : 0)).ToString(), RLColor.White);
+                }
+            }
+        }
+
+        public bool CheckPosition(Vector pos)
+        {
+            if (map[pos.X, pos.Y] != 0)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public void Move(Vector from, Vector to)
+        {
+            map[from.X, from.Y] = 0;
+            map[to.X, to.Y] = -1;
+        }
     }
 
     public struct Vector

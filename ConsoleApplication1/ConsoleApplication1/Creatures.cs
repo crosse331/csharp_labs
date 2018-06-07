@@ -66,7 +66,11 @@ namespace ConsoleApplication1
                 return;
             }
             prevPos = this.position;
-            var world = Program.mainWorld;
+            var world = Program.GetWorld();
+            if (world == null)
+            {
+                Console.WriteLine("ALARM! World is null");
+            }
             if (world.CheckPosition(this.position + dir))
             {
                 world.Move(this.position, this.position + dir);
