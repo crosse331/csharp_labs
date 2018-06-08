@@ -16,7 +16,7 @@ namespace ConsoleApplication1
     {
         private const int WALL = 219;
 
-        private int[,] map = new int[50, 35];
+        private int[,] map = new int[32, 32];
         private Random randomizer = new Random();
 
         public static Vector cameraPosition { get; private set; }
@@ -34,7 +34,11 @@ namespace ConsoleApplication1
                 {
                     if (i == 0 || j == 0 || i == map.GetLength(0) - 1 || j == map.GetLength(1) - 1)
                     {
-                        map[i, j] = WALL;
+                        if (i != map.GetLength(0) / 2 - 1 && i != map.GetLength(0) / 2 &&
+                            j != map.GetLength(1) / 2 - 1 && j != map.GetLength(1) / 2)
+                        {
+                            map[i, j] = WALL;
+                        }
                     }
                     else
                     {
@@ -60,6 +64,10 @@ namespace ConsoleApplication1
 
         public bool CheckPosition(Vector pos)
         {
+            if (pos.X < 0 || pos.X >= map.GetLength(0) || pos.Y < 0 || pos.Y >= map.GetLength(1))
+            {
+                return false;
+            }
             if (map[pos.X, pos.Y] != 0)
             {
                 return false;

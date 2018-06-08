@@ -30,12 +30,16 @@ namespace ConsoleApplication1
 
     public class Attack
     {
+        public static readonly List<Vector> BASE_ATTACK = new List<Vector>() { Vector.Zero };
+        public static readonly List<Vector> LONG_ATTACK = new List<Vector>() { Vector.Zero, Vector.Up };
+        public static readonly List<Vector> WIDE_ATTACK = new List<Vector>() { Vector.Zero, Vector.Right, -Vector.Right };
+
         private AttackType type;
         private Vector from;
         private Vector to;
         public int damage;
 
-        private Vector realPos;
+        private List<Vector> realPos = new List<Vector>();
 
         public int ticks = 15;
 
@@ -44,7 +48,7 @@ namespace ConsoleApplication1
         private Creature parent = null;
         private List<Creature> damagedCreatures = new List<Creature>();
 
-        public Attack(AttackType tp, Vector frm, Vector t, int dmg, Creature crea)
+        public Attack(AttackType tp, Vector frm, Vector t, int dmg, Creature crea, List<Vector> zone)
         {
             this.type = tp;
             this.from = frm;
@@ -53,15 +57,31 @@ namespace ConsoleApplication1
 
             this.parent = crea;
 
-            realPos = from + to;
+            var dir = to - from;
+            
+            for (int i=0;i<zone.Count;i++)
+            {
+                this.realPos.Add(this.RotateVector(zone[i], dir) + from + to);
+            }
 
             AttacksContainer.Add(this);
             var timer = new Timer("attack", ticks, () => { AttacksContainer.Remove(this); });
         }
 
+        private Vector RotateVector(Vector def, Vector dir)
+        {
+            Vector tmp = def;
+            def.X *= dir.X;
+            def.Y *= dir.Y;
+            return tmp;
+        }
+
         public void Render(RLConsole console)
         {
-            console.Print(realPos.X, realPos.Y, symbol.ToString(), RLColor.Gray);
+            for (int i = 0; i < realPos.Count; i++)
+            {
+                console.Print(realPos[i].X, realPos[i].Y, symbol.ToString(), RLColor.Gray);
+            }
         }
 
         public void Logic()
@@ -70,11 +90,14 @@ namespace ConsoleApplication1
             {
                 case AttackType.Melee:
                     {
-                        var crea = CreaturesContainer.GetCreatureOnPosition(realPos);
-                        if (crea != null && crea != parent && !this.damagedCreatures.Contains(crea))
+                        for (int i = 0; i < realPos.Count; i++)
                         {
-                            crea.GetDamaged(this);
-                            this.damagedCreatures.Add(crea);
+                            var crea = CreaturesContainer.GetCreatureOnPosition(realPos[i]);
+                            if (crea != null && crea != parent && !this.damagedCreatures.Contains(crea))
+                            {
+                                crea.GetDamaged(this);
+                                this.damagedCreatures.Add(crea);
+                            }
                         }
                         break;
                     }

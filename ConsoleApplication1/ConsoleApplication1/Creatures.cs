@@ -95,7 +95,7 @@ namespace ConsoleApplication1
 
             this.currentAnimation = new Animation(new List<char>() { '!' }, 10, this, () =>
              {
-                 var attack = new Attack(AttackType.Melee, this.position, this.facing, 25, this);
+                 var attack = new Attack(AttackType.Melee, this.position, this.facing, 25, this, Attack.LONG_ATTACK);
                  this.Stamina -= 30;
                  if (this.staminaTimer != null)
                  {
@@ -158,10 +158,10 @@ namespace ConsoleApplication1
             var keyPress = Program.MainConsole.Keyboard.GetKeyPress();
             if (keyPress != null)
             {
-                if (keyPress.Key == lastPressedKey || keyPress.Repeating)
-                {
-                    return;
-                }
+                //if (keyPress.Key == lastPressedKey || keyPress.Repeating)
+                //{
+                //    return;
+                //}
                 lastPressedKey = keyPress.Key;
                 switch (keyPress.Key)
                 {

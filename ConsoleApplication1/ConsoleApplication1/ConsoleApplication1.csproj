@@ -64,6 +64,7 @@
     <Compile Include="GameLogic.cs" />
     <Compile Include="Gui.cs" />
     <Compile Include="Logic.cs" />
+    <Compile Include="Network.cs" />
     <Compile Include="NewLogic.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

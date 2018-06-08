@@ -199,6 +199,8 @@ namespace ConsoleApplication1
 
         public World mainWorld { get; private set; }
 
+        //private Server testServer;
+
         public override void Render(RLConsole mainConsole)
         {
             RLConsole.Blit(statsConsole, 0, 0, statsConsoleRect.Size.X, statsConsoleRect.Size.Y,
@@ -216,6 +218,7 @@ namespace ConsoleApplication1
         {
             CreaturesContainer.MovingLogic();
             AttacksContainer.Logic();
+            //testServer.Logic();
         }
 
         public override void Init()
@@ -229,6 +232,9 @@ namespace ConsoleApplication1
             mainHud = new Hud(player);
 
             mainWorld = new World();
+
+            //testServer = new Server();
+            //testServer.Init();
         }
     }
 
