@@ -95,7 +95,7 @@ namespace ConsoleApplication1
 
             this.currentAnimation = new Animation(new List<char>() { '!' }, 10, this, () =>
              {
-                 var attack = new Attack(AttackType.Melee, this.position, this.facing, 25, this, Attack.LONG_ATTACK);
+                 var attack = new Attack(AttackType.Melee, this.position, this.facing, 25, this, Attack.LW_ATTACK);
                  this.Stamina -= 30;
                  if (this.staminaTimer != null)
                  {

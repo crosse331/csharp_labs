@@ -33,6 +33,7 @@ namespace ConsoleApplication1
         public static readonly List<Vector> BASE_ATTACK = new List<Vector>() { Vector.Zero };
         public static readonly List<Vector> LONG_ATTACK = new List<Vector>() { Vector.Zero, Vector.Up };
         public static readonly List<Vector> WIDE_ATTACK = new List<Vector>() { Vector.Zero, Vector.Right, -Vector.Right };
+        public static readonly List<Vector> LW_ATTACK = new List<Vector>() { Vector.Zero, Vector.Right, -Vector.Right, Vector.Up };
 
         private AttackType type;
         private Vector from;
@@ -57,9 +58,9 @@ namespace ConsoleApplication1
 
             this.parent = crea;
 
-            var dir = to - from;
-            
-            for (int i=0;i<zone.Count;i++)
+            var dir = to;
+
+            for (int i = 0; i < zone.Count; i++)
             {
                 this.realPos.Add(this.RotateVector(zone[i], dir) + from + to);
             }
@@ -71,8 +72,22 @@ namespace ConsoleApplication1
         private Vector RotateVector(Vector def, Vector dir)
         {
             Vector tmp = def;
-            def.X *= dir.X;
-            def.Y *= dir.Y;
+            if (dir == Vector.Right)
+            {
+                tmp.X = -def.Y;
+                tmp.Y = def.X;
+            }
+            else if (dir == -Vector.Right)
+            {
+                tmp.X = def.Y;
+                tmp.Y = -def.X;
+            }
+            else if (dir == -Vector.Up)
+            {
+                tmp.Y = -def.Y;
+            }
+
+
             return tmp;
         }
 

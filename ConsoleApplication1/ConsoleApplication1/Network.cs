@@ -27,17 +27,27 @@ namespace ConsoleApplication1
 
             curSocket.Bind(curPoint);
             curSocket.Listen(10);
+
+            Console.WriteLine("Сервер запущен. Ожидание подключений...");
         }
 
         public void Logic()
         {
-            Console.WriteLine("Сервер запущен. Ожидание подключений...");
+            
 
             //if (curSocket. == 0)
             //{
             //    return;
             //}
+            if (!curSocket.Poll(0, SelectMode.SelectRead))
+            {
+                return;
+            }
             Socket handler = curSocket.Accept();
+            if (handler == null)
+            {
+                return;
+            }
             var builder = new StringBuilder();
             int bytes = 0;
             byte[] data = new byte[256];

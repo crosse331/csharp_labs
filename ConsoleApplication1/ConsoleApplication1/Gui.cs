@@ -199,7 +199,7 @@ namespace ConsoleApplication1
 
         public World mainWorld { get; private set; }
 
-        //private Server testServer;
+        private Server testServer;
 
         public override void Render(RLConsole mainConsole)
         {
@@ -218,7 +218,7 @@ namespace ConsoleApplication1
         {
             CreaturesContainer.MovingLogic();
             AttacksContainer.Logic();
-            //testServer.Logic();
+            testServer.Logic();
         }
 
         public override void Init()
@@ -233,8 +233,8 @@ namespace ConsoleApplication1
 
             mainWorld = new World();
 
-            //testServer = new Server();
-            //testServer.Init();
+            testServer = new Server();
+            testServer.Init();
         }
     }
 
@@ -245,6 +245,7 @@ namespace ConsoleApplication1
         private ObjectList mainMenuList = new ObjectList(new List<StrListItem>()
         {
             new StrListItem("New Game", () => { Program.currentState = new MainGame(); }),
+            new StrListItem("Net tester", () => {Program.currentState = new NetTester(); }),
             new StrListItem("Quit", () => { Program.MainConsole.Close(); })
         });
 
@@ -266,6 +267,27 @@ namespace ConsoleApplication1
                 0, 0);
 
             mainMenuList.Render(console);
+        }
+    }
+
+    public class NetTester : GameState
+    {
+        Client client;
+
+        public override void Init()
+        {
+            client = new Client();
+            client.Init();
+        }
+
+        public override void Logic()
+        {
+            client.Logic();
+        }
+
+        public override void Render(RLConsole mainConsole)
+        {
+            
         }
     }
 }
