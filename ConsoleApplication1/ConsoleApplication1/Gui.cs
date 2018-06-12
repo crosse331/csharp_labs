@@ -70,13 +70,19 @@ namespace ConsoleApplication1
 
         public Hud(Creature tar)
         {
-            this.target = tar;
-            heroPanel = new StatsPanel(tar);
+            if (tar != null)
+            {
+                this.target = tar;
+                heroPanel = new StatsPanel(tar);
+            }
         }
 
         public void Render(RLConsole console)
         {
-            heroPanel.Render(console);
+            if (heroPanel != null)
+            {
+                heroPanel.Render(console);
+            }
         }
 
     }
@@ -191,15 +197,17 @@ namespace ConsoleApplication1
     public class MainGame : GameState
     {
         public RLConsole statsConsole { get; private set; }
-        private Rect statsConsoleRect = new Rect(0, 0, 20, 5);
+        protected Rect statsConsoleRect = new Rect(0, 0, 20, 5);
         public RLConsole worldConsole { get; private set; }
-        private Rect worldConsoleRect = new Rect(0, 5, 55, 35);
+        protected Rect worldConsoleRect = new Rect(0, 5, 55, 35);
 
-        private Hud mainHud;
+        protected Hud mainHud;
 
         public World mainWorld { get; private set; }
 
         private Server testServer;
+
+        private Player curPlayer;
 
         public override void Render(RLConsole mainConsole)
         {
@@ -218,7 +226,9 @@ namespace ConsoleApplication1
         {
             CreaturesContainer.MovingLogic();
             AttacksContainer.Logic();
+            NetContainer.Logic();
             testServer.Logic();
+            mainWorld.Logic(curPlayer);
         }
 
         public override void Init()
@@ -226,15 +236,70 @@ namespace ConsoleApplication1
             statsConsole = new RLConsole(statsConsoleRect.Size.X, statsConsoleRect.Size.Y);
             worldConsole = new RLConsole(worldConsoleRect.Size.X, worldConsoleRect.Size.Y);
 
-            var player = new Player((char)2, Vector.One * 10, RLColor.White);/*new RLColor(0.4f, 0.4f, 0.4f));*/
-            var enemy = new TestEnemy((char)1, Vector.One * 15, RLColor.White);
+            curPlayer = new Player((char)2, Vector.One * 10, RLColor.White);/*new RLColor(0.4f, 0.4f, 0.4f));*/
+            //var enemy = new TestEnemy((char)1, Vector.One * 15, RLColor.White);
 
-            mainHud = new Hud(player);
+            mainHud = new Hud(curPlayer);
 
             mainWorld = new World();
 
             testServer = new Server();
             testServer.Init();
+        }
+    }
+
+    public class ClientMainGame : GameState
+    {
+        public RLConsole statsConsole { get; private set; }
+        protected Rect statsConsoleRect = new Rect(0, 0, 20, 5);
+        public RLConsole worldConsole { get; private set; }
+        protected Rect worldConsoleRect = new Rect(0, 5, 55, 35);
+
+        protected Hud mainHud;
+
+        public World mainWorld { get; private set; }
+
+        public Client client;
+
+        private Player curPlayer;
+
+        public override void Render(RLConsole mainConsole)
+        {
+            RLConsole.Blit(statsConsole, 0, 0, statsConsoleRect.Size.X, statsConsoleRect.Size.Y,
+                mainConsole, statsConsoleRect.Pos.X, statsConsoleRect.Pos.Y);
+            RLConsole.Blit(worldConsole, 0, 0, worldConsoleRect.Size.X, worldConsoleRect.Size.Y,
+                mainConsole, worldConsoleRect.Pos.X, worldConsoleRect.Pos.Y);
+
+            mainWorld.Render(worldConsole);
+            CreaturesContainer.RenderLogic(worldConsole);
+            AttacksContainer.Render(worldConsole);
+            mainHud.Render(statsConsole);
+        }
+
+        public override void Logic()
+        {
+            CreaturesContainer.MovingLogic();
+            AttacksContainer.Logic();
+            NetContainer.Logic();
+            mainWorld.Logic(curPlayer);
+        }
+
+        public override void Init()
+        {
+            statsConsole = new RLConsole(statsConsoleRect.Size.X, statsConsoleRect.Size.Y);
+            worldConsole = new RLConsole(worldConsoleRect.Size.X, worldConsoleRect.Size.Y);
+
+            //var player = new Player((char)2, Vector.One * 10, RLColor.White);/*new RLColor(0.4f, 0.4f, 0.4f));*/
+            //var enemy = new TestEnemy((char)1, Vector.One * 15, RLColor.White);
+
+            mainHud = new Hud(null);
+
+            mainWorld = new World();
+
+            client = new Client();
+            client.Init();
+
+            Program.isServer = false;
         }
     }
 
@@ -245,7 +310,7 @@ namespace ConsoleApplication1
         private ObjectList mainMenuList = new ObjectList(new List<StrListItem>()
         {
             new StrListItem("New Game", () => { Program.currentState = new MainGame(); }),
-            new StrListItem("Net tester", () => {Program.currentState = new NetTester(); }),
+            new StrListItem("Connect", () => {Program.currentState = new ClientMainGame(); }),
             new StrListItem("Quit", () => { Program.MainConsole.Close(); })
         });
 

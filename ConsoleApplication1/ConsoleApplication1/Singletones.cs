@@ -60,7 +60,7 @@ namespace ConsoleApplication1
 
         public static Player GetPlayer()
         {
-            for (int i=0;i< container.Count;i++)
+            for (int i = 0; i < container.Count; i++)
             {
                 if (container[i] is Player)
                 {
@@ -70,9 +70,22 @@ namespace ConsoleApplication1
 
             return null;
         }
+
+        public static Creature GetCreature(int id)
+        {
+            for (int i=0;i<container.Count;i++)
+            {
+                if (container[i].ID == id)
+                {
+                    return container[i];
+                }
+            }
+
+            return null;
+        }
     }
 
-    public  class TimersContainer : Container<Timer>
+    public class TimersContainer : Container<Timer>
     {
         public static void Logic()
         {
@@ -87,7 +100,7 @@ namespace ConsoleApplication1
     {
         public static void Logic()
         {
-            for (int i=0;i<container.Count;i++)
+            for (int i = 0; i < container.Count; i++)
             {
                 container[i].Logic();
             }
@@ -99,6 +112,48 @@ namespace ConsoleApplication1
             {
                 container[i].Render(console);
             }
+        }
+    }
+
+    public class NetContainer : Container<NetObject>
+    {
+        public static new void Add(NetObject item)
+        {
+            container.Add(item);
+            item.ID = container.Count - 1;
+        }
+
+        public static void Logic()
+        {
+            for (int i = 0; i < container.Count; i++)
+            {
+                container[i].NetLogic();
+            }
+        }
+
+        public static string GetAllCreatures(string requesterId)
+        {
+            string result = "gac \n";
+            foreach (var obj in container)
+            {
+                if (obj is Creature)
+                {
+                    var tmp = obj as Creature;
+                    string str = tmp.ID.ToString() + ": " + tmp.position.X + ", " + tmp.position.Y + ", " + tmp.symbol + "\n";
+                    if (tmp is ClientPlayer)
+                    {
+                        var pl = tmp as ClientPlayer;
+                        if (pl.playerId == requesterId)
+                        {
+                            str = "p" + str;
+                        }
+                    }
+
+                    result += str;
+                }
+            }
+
+            return result;
         }
     }
 }

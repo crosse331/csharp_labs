@@ -10,6 +10,8 @@ namespace ConsoleApplication1
 {
     class Program
     {
+        public static bool isServer = true;
+
         public static RLRootConsole MainConsole { get; private set; }
         private static Rect mainConsoleSize = new Rect(0, 0, 60, 40);
 

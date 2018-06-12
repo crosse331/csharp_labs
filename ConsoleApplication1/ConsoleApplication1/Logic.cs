@@ -1,6 +1,7 @@
 ﻿using RLNET;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,11 +20,15 @@ namespace ConsoleApplication1
         private int[,] map = new int[32, 32];
         private Random randomizer = new Random();
 
-        public static Vector cameraPosition { get; private set; }
+        private int[,] world = new int[512, 512];
+
+        //public static Vector cameraPosition { get; private set; }
+        public Vector globalPosition;
 
         public World()
         {
             this.Generate();
+            //this.LoadWorld();
         }
 
         public void Generate()
@@ -51,13 +56,35 @@ namespace ConsoleApplication1
             }
         }
 
+        public void Logic(Player p)
+        {
+            //this.globalPosition = new Vector(p.position.X / 32, p.position.Y / 32);
+        }
+
+        public void LoadWorld()
+        {
+            var img = (Bitmap)Bitmap.FromFile("map.png");
+
+            for (int i = 0; i < img.Width; i++)
+            {
+                for (int j = 0; j < img.Height; j++)
+                {
+                    var col = img.GetPixel(i, j);
+                    this.world[i, j] = (col.ToArgb() == Color.White.ToArgb() ? WALL : 0);
+                }
+            }
+        }
+
         public void Render(RLConsole console)
         {
-            for (int i = 0; i < map.GetLength(0); i++)
+            for (int i = 0; i < 32; i++)
             {
-                for (int j = 0; j < map.GetLength(1); j++)
+                for (int j = 0; j < 32; j++)
                 {
-                    console.Print(i, j, ((char)(map[i, j] > 0 ? map[i, j] : 0)).ToString(), RLColor.White);
+                    console.Print(i, j,
+                        ((char)(map[globalPosition.X * 32 + i, globalPosition.Y * 32 + j] > 0 ?
+                        map[globalPosition.X * 32 + i, globalPosition.Y * 32 + j] : 0)).ToString(),
+                        RLColor.White);
                 }
             }
         }

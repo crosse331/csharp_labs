@@ -9,7 +9,7 @@ using MathLogic;
 
 namespace ConsoleApplication1
 {
-    public class Creature
+    public class Creature : NetObject
     {
         public Vector position { get; protected set; }
         public Vector facing { get; protected set; }
@@ -78,6 +78,9 @@ namespace ConsoleApplication1
                 this.facing = dir;
                 this.canMove = false;
                 var timer = new Timer(this.symbol.ToString(), movingDelay, () => { this.canMove = true; });
+
+                this.isChanged = true;
+                this.changedInfo += " " + position.X + ", " + position.Y + ";";
             }
         }
 
@@ -132,8 +135,15 @@ namespace ConsoleApplication1
             this.Hp -= att.damage;
             if (this.Hp.GetCurrent() <= 0)
             {
+                this.isChanged = true;
+                this.changedInfo += "dead;";
                 CreaturesContainer.Remove(this);
             }
+        }
+
+        public void UpdateData(Vector newPos)
+        {
+            this.position = newPos;
         }
     }
 
@@ -180,6 +190,30 @@ namespace ConsoleApplication1
             {
                 lastPressedKey = RLKey.Unknown;
             }
+        }
+
+        public override void TryToMove(Vector dir)
+        {
+            if (!Program.isServer)
+            {
+                this.isChanged = true;
+                this.changedInfo += "ttm: " + dir.X + ", " + dir.Y + ";";
+                return;
+            }
+
+            base.TryToMove(dir);
+        }
+
+        public override void TryToAttack(Vector dir)
+        {
+            if (!Program.isServer)
+            {
+                this.isChanged = true;
+                this.changedInfo += "tta: " + dir.X + ", " + dir.Y + ";";
+                return;
+            }
+
+            base.TryToAttack(dir);
         }
     }
 
